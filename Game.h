@@ -1,10 +1,10 @@
 #pragma once
 #include <iostream>
 #include "Win.h"
-#include "AI.h"
+#include <vector>
 
-#define PLAYER_ONE true
-#define PLAYER_TWO false
+#define PLAYER_ONE 1
+#define PLAYER_TWO 2
 #define EASY 1
 #define NORMAL 2
 #define HARD 3
@@ -18,13 +18,16 @@ using std::cin;
 using std::endl;
 using std::string;
 using std::pair;
+using std::vector;
+
+class AI;
 
 class Game {
 private:
 	const int rowCount = 3;
 	const int colCount = 3;
 	char** board;
-	bool player = PLAYER_ONE;
+	int player = PLAYER_ONE;
 	string playerOne = "Player One";
 	string playerTwo = "Player Two";
 	int humanPlayer;
@@ -35,10 +38,13 @@ private:
 	bool gameOngoing = true;
 
 public:
+	vector<pair<int, int>> availableIndexes;
+
 	void Initialize();
 	pair<int, int> getPlayerInput();
 	pair<int, int> getRowCol(int input);
 	bool checkIndex(pair<int, int> rowCol);
+	void addMark(pair<int, int> boxIndex);
 	bool checkFinish();
 	bool checkTie();
 	bool checkDiagonalRight();
@@ -50,8 +56,9 @@ public:
 	void printBoard();
 	void endTurn();
 	bool promptRestart();
-	void clearBoard();
+	void initializeBoard();
 	void setComputerParameters();
+	pair<int, int> getRandomAvailableIndex();
 
 	Game();
 	~Game();

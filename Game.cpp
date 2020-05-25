@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "AI.h"
 /*
 	TODO:
 	AI - Waits 1 second to make a move. 
@@ -13,11 +14,9 @@ Game::Game() {
 	char index = '1';
 	for (int i = 0; i < rowCount; i++) {
 		board[i] = new char[colCount];
-		for (int j = 0; j < colCount; j++) {
-			board[i][j] = index;
-			index++;
-		}
 	}
+	
+	initializeBoard();
 }
 
 Game::~Game() {
@@ -26,6 +25,7 @@ Game::~Game() {
 }
 
 void Game::Initialize() {
+	initializeBoard();
 	do
 	{
 		system("cls");
@@ -40,8 +40,8 @@ void Game::Initialize() {
 
 	do
 	{
-		pair<int, int> boxIndex = ((opponent == 1 && player != PLAYER_TWO) ? computer->getComputerInput(this) : getPlayerInput());
-		board[boxIndex.first][boxIndex.second] = player == PLAYER_ONE ? 'X' : 'O';
+		pair<int, int> boxIndex = (opponent == 1 && player != humanPlayer) ? computer->getComputerInput(this) : getPlayerInput();
+		addMark(boxIndex);
 		if (checkFinish()) {
 			gameOngoing = false;
 			if (win != NULL) {
@@ -52,11 +52,26 @@ void Game::Initialize() {
 			}
 			gameOngoing = promptRestart();
 			if (gameOngoing) {
-				clearBoard();
+				Initialize();
 			}
 		}
 		endTurn();
 	} while (gameOngoing);
+}
+
+pair<int, int> Game::getRandomAvailableIndex() {
+
+	pair<int, int> IndexToReturn;
+	srand(time(NULL));
+	int index = rand() % (availableIndexes.size() - 1);
+	IndexToReturn = availableIndexes[index];
+	return availableIndexes[index];	
+}
+
+void Game::addMark(pair<int, int> boxIndex)
+{
+	board[boxIndex.first][boxIndex.second] = player == PLAYER_ONE ? 'X' : 'O';
+	availableIndexes.erase(find(availableIndexes.begin(), availableIndexes.end(), boxIndex));
 }
 
 pair<int, int> Game::getPlayerInput() {
@@ -105,10 +120,15 @@ bool Game::promptRestart() {
 	return choice == 'y' ? true : false;	
 }
 
-void Game::clearBoard() {
+void Game::initializeBoard() {
 	char index = '1';
 	for (int i = 0; i < rowCount; i++) {
 		for (int j = 0; j < colCount; j++) {
+			pair<int, int> pairIndex;
+			pairIndex.first = i;
+			pairIndex.second = j;
+			availableIndexes.push_back(pairIndex);
+
 			board[i][j] = index;
 			index++;
 		}
@@ -199,7 +219,7 @@ bool Game::checkRow(int row) {
 
 void Game::printWinner() {
 	printBoard();
-	cout << (player ? playerOne : playerTwo) << " is the winner!" << endl;
+	cout << ((player == 1) ? playerOne : playerTwo) << " is the winner!" << endl;
 	win->winningMessage();
 	cout << endl;
 }
@@ -212,7 +232,7 @@ void Game::printTie() {
 void Game::printBoard() {
 	system("cls");
 	// player == true -> player one string
-	cout << (player ? playerOne : playerTwo) << "\'s turn";
+	cout << ((player == 1) ? playerOne : playerTwo) << "\'s turn";
 	cout << endl;
 
 
@@ -234,7 +254,7 @@ void Game::printBoard() {
 
 // switch player turn
 void Game::endTurn() {
-	player = player ? PLAYER_TWO : PLAYER_ONE;
+	player = player == 1 ? PLAYER_TWO : PLAYER_ONE;
 }
 
 void Game::setComputerParameters() {
@@ -260,7 +280,7 @@ void Game::setComputerParameters() {
 
 	// on insane difficulty player is unable to go first unless number is entered
 	if (difficulty == INSANE) {
-		firstPlayer = 2;
+		humanPlayer = 2;
 	}
 	else
 	{
@@ -269,7 +289,7 @@ void Game::setComputerParameters() {
 			system("cls");
 			cout << "Would you like to go first or second?" << endl << "(1) First" << endl << "(2) Second" << endl;
 			cout << "Your choice: ";
-			cin >> firstPlayer;
-		} while (firstPlayer != 1 && firstPlayer != 2);
+			cin >> humanPlayer;
+		} while (humanPlayer != 1 && humanPlayer != 2);
 	}
 }
