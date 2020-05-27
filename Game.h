@@ -45,7 +45,7 @@ public:
 	pair<int, int> getRowCol(int input);
 	bool checkIndex(pair<int, int> rowCol);
 	void addMark(pair<int, int> boxIndex);
-	bool checkFinish();
+	bool checkFinish(char** board);
 	bool checkTie();
 	bool checkDiagonalRight();
 	bool checkDiagonalLeft();
@@ -58,7 +58,9 @@ public:
 	bool promptRestart();
 	void initializeBoard();
 	void setComputerParameters();
+	void deleteWin();
 	pair<int, int> getRandomAvailableIndex();
+	char** getBoard();
 
 	Game();
 	~Game();

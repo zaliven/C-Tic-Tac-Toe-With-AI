@@ -40,7 +40,7 @@ void Game::Initialize() {
 		printBoard();
 		pair<int, int> boxIndex = (opponent == 1 && player != humanPlayer) ? computer->getComputerInput(this) : getPlayerInput();
 		addMark(boxIndex);
-		if (checkFinish()) {
+		if (checkFinish(board)) {
 			gameOngoing = false;
 			if (win != NULL) {
 				printWinner();
@@ -135,7 +135,7 @@ void Game::initializeBoard() {
 	}
 }
 
-bool Game::checkFinish() {
+bool Game::checkFinish(char** board) {
 	int i;
 	int j;
 	//check rows
@@ -144,6 +144,10 @@ bool Game::checkFinish() {
 			continue;
 		}
 		if (checkRow(i)) {
+			if (win) {
+				// win might have been initialized on previous checkfinish
+				deleteWin();
+			}
 			win = new RowWin(i+1);
 			return true;
 		}
@@ -154,16 +158,28 @@ bool Game::checkFinish() {
 			continue;
 		}
 		if (checkColumn(i)) {
+			if (win) {
+				// win might have been initialized on previous checkfinish
+				deleteWin();
+			}
 			win = new ColumnWin(i+1);
 			return true;
 		}
 	}
 	//check diagonal
 	if (checkDiagonalRight()) {
+		if (win) {
+			// win might have been initialized on previous checkfinish
+			deleteWin();
+		}
 		win = new DiagonalWin("Right");
 		return true;
 	}
 	if (checkDiagonalLeft()) {
+		if (win) {
+			// win might have been initialized on previous checkfinish
+			deleteWin();
+		}
 		win = new DiagonalWin("Left");
 		return true;
 	}
@@ -172,6 +188,10 @@ bool Game::checkFinish() {
 		return true;
 	}
 	return false;
+}
+
+void Game::deleteWin() {
+	delete win;
 }
 
 bool Game::checkTie() {
@@ -302,4 +322,8 @@ void Game::setComputerParameters() {
 			playerOne = "Your";
 		}
 	}
+}
+
+char** Game::getBoard() {
+	return board;
 }
