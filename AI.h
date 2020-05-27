@@ -1,6 +1,8 @@
 #pragma once
 #include <iostream>
 #include <time.h>
+#include <thread>
+#include <chrono>
 using std::pair;
 
 class Game;
@@ -13,6 +15,7 @@ public:
 class EasyAI : public AI {
 public:
 	pair<int, int> getComputerInput(Game* game) {
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 		return game->getRandomAvailableIndex();
 	}
 };

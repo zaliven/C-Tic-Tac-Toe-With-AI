@@ -2,8 +2,7 @@
 #include "AI.h"
 /*
 	TODO:
-	AI - Waits 1 second to make a move. 
-	Easy - Vector that updates each round and has all available indexes. Moves randomly
+	Easy - Vector that updates each round and has all available indexes. Moves randomly. Sometimes glitches on restarts.
 	Medium - AI Code
 	Hard - Unbeatable
 	https://mblogscode.com/2016/06/03/python-naughts-crossestic-tac-toe-coding-unbeatable-ai/
@@ -15,8 +14,6 @@ Game::Game() {
 	for (int i = 0; i < rowCount; i++) {
 		board[i] = new char[colCount];
 	}
-	
-	initializeBoard();
 }
 
 Game::~Game() {
@@ -40,6 +37,7 @@ void Game::Initialize() {
 
 	do
 	{
+		printBoard();
 		pair<int, int> boxIndex = (opponent == 1 && player != humanPlayer) ? computer->getComputerInput(this) : getPlayerInput();
 		addMark(boxIndex);
 		if (checkFinish()) {
@@ -52,6 +50,7 @@ void Game::Initialize() {
 			}
 			gameOngoing = promptRestart();
 			if (gameOngoing) {
+				player = 1;
 				Initialize();
 			}
 		}
@@ -60,12 +59,11 @@ void Game::Initialize() {
 }
 
 pair<int, int> Game::getRandomAvailableIndex() {
-
 	pair<int, int> IndexToReturn;
 	srand(time(NULL));
-	int index = rand() % (availableIndexes.size() - 1);
+	int index = rand() % (availableIndexes.size());
 	IndexToReturn = availableIndexes[index];
-	return availableIndexes[index];	
+	return availableIndexes[index];	 
 }
 
 void Game::addMark(pair<int, int> boxIndex)
@@ -80,7 +78,6 @@ pair<int, int> Game::getPlayerInput() {
 	pair<int, int> rowCol;
 	do
 	{
-		printBoard();
 		if (!valid) {
 			cout << "Invalid cell number!" << endl;
 		}
@@ -93,7 +90,7 @@ pair<int, int> Game::getPlayerInput() {
 }
 
 bool Game::checkIndex(pair<int, int> rowCol) {
-	bool isValid = isdigit(board[rowCol.first][rowCol.second]);
+	bool isValid = rowCol.first <= 2 && rowCol.second <= 2 && isdigit(board[rowCol.first][rowCol.second]);
 	return isValid;
 }
 
@@ -121,6 +118,7 @@ bool Game::promptRestart() {
 }
 
 void Game::initializeBoard() {
+	availableIndexes.clear();
 	char index = '1';
 	for (int i = 0; i < rowCount; i++) {
 		for (int j = 0; j < colCount; j++) {
@@ -188,14 +186,16 @@ bool Game::checkTie() {
 bool Game::checkDiagonalRight() {
 	bool diagonalWin = false;
 	if (isdigit(board[0][0])) return false;
-	if (board[0][0] == board[1][1] && board[1][1] == board[2][2]) diagonalWin = true;
+	if (board[0][0] == board[1][1] && board[1][1] == board[2][2]) 
+		diagonalWin = true;
 	return diagonalWin;
 }
 
 bool Game::checkDiagonalLeft() {
 	bool diagonalWin = false;
 	if (isdigit(board[2][0])) return false;
-	if (board[0][2] == board[1][1] && board[1][1] == board[2][0]) diagonalWin = true;
+	if (board[0][2] == board[1][1] && board[1][1] == board[2][0]) 
+		diagonalWin = true;
 	return diagonalWin;
 }
 
@@ -278,7 +278,7 @@ void Game::setComputerParameters() {
 		break;
 	}
 
-	// on insane difficulty player is unable to go first unless number is entered
+	// on insane difficulty player is unable to go first
 	if (difficulty == INSANE) {
 		humanPlayer = 2;
 	}
