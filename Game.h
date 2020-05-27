@@ -28,8 +28,8 @@ private:
 	const int colCount = 3;
 	char** board;
 	int player = PLAYER_ONE;
-	string playerOne = "Player One";
-	string playerTwo = "Player Two";
+	string playerOne;
+	string playerTwo;
 	int humanPlayer;
 	int opponent;
 	int difficulty;

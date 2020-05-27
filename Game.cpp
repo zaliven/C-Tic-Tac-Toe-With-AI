@@ -50,7 +50,7 @@ void Game::Initialize() {
 			}
 			gameOngoing = promptRestart();
 			if (gameOngoing) {
-				player = 1;
+				player = 1; //reset player
 				Initialize();
 			}
 		}
@@ -119,6 +119,8 @@ bool Game::promptRestart() {
 
 void Game::initializeBoard() {
 	availableIndexes.clear();
+	playerOne = "Player One";
+	playerTwo = "Player Two";
 	char index = '1';
 	for (int i = 0; i < rowCount; i++) {
 		for (int j = 0; j < colCount; j++) {
@@ -232,7 +234,7 @@ void Game::printTie() {
 void Game::printBoard() {
 	system("cls");
 	// player == true -> player one string
-	cout << ((player == 1) ? playerOne : playerTwo) << "\'s turn";
+	cout << ((player == 1) ? playerOne : playerTwo) << " turn";
 	cout << endl;
 
 
@@ -291,5 +293,13 @@ void Game::setComputerParameters() {
 			cout << "Your choice: ";
 			cin >> humanPlayer;
 		} while (humanPlayer != 1 && humanPlayer != 2);
+		if (humanPlayer == 2) {
+			playerOne = "Computer";
+			playerTwo = "Your";
+		}
+		else {
+			playerTwo = "Computer";
+			playerOne = "Your";
+		}
 	}
 }
