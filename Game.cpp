@@ -43,6 +43,7 @@ void Game::Initialize() {
 			}
 			gameOngoing = promptRestart();
 			if (gameOngoing) {
+				humanPlayer = 0;
 				player = 1; //reset player
 				if (win != NULL) {
 					// prevent winning on tie on next round
