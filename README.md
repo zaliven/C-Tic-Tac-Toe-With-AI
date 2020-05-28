@@ -10,4 +10,4 @@ Normal - AI checks for win moves (player and AI), checks if a corner is availabl
 
 Hard - AI checks for win moves (player and AI), checks for fork moves, checks if center is available and then checks if a corner is available
 
-Insane - Hard difficulty but you go second
+Insane - Hard difficulty but you always go second
