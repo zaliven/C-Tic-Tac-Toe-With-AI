@@ -13,6 +13,7 @@ char** AI::getBoardCopy(Game* game) {
 			board[i][j] = gameBoard[i][j];
 		}
 	}
+	return board;
 }
 
 pair<int, int> EasyAI::getComputerInput(Game* game) {

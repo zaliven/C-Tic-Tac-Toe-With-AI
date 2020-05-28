@@ -51,6 +51,10 @@ void Game::Initialize() {
 			gameOngoing = promptRestart();
 			if (gameOngoing) {
 				player = 1; //reset player
+				if (win != NULL) {
+					delete win;
+					win = NULL;
+				}
 				Initialize();
 			}
 		}
