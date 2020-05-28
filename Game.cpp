@@ -1,12 +1,5 @@
 #include "Game.h"
 #include "AI.h"
-/*
-	TODO:
-	Easy - Vector that updates each round and has all available indexes. Moves randomly. Sometimes glitches on restarts.
-	Medium - AI Code
-	Hard - Unbeatable
-	https://mblogscode.com/2016/06/03/python-naughts-crossestic-tac-toe-coding-unbeatable-ai/
-*/
 
 Game::Game() {
 	board = new char* [rowCount];
@@ -38,9 +31,9 @@ void Game::Initialize() {
 	do
 	{
 		printBoard();
-		pair<int, int> boxIndex = (opponent == 1 && player != humanPlayer) ? computer->getComputerInput(this) : getPlayerInput();
+		pair<int, int> boxIndex = (opponent == 1 && player != humanPlayer) ? computer->getComputerInput() : getPlayerInput();
 		addMark(boxIndex);
-		if (checkFinish(board)) {
+		if (checkFinish(board, true)) {
 			gameOngoing = false;
 			if (win != NULL) {
 				printWinner();
@@ -52,6 +45,7 @@ void Game::Initialize() {
 			if (gameOngoing) {
 				player = 1; //reset player
 				if (win != NULL) {
+					// prevent winning on tie on next round
 					delete win;
 					win = NULL;
 				}
@@ -139,7 +133,8 @@ void Game::initializeBoard() {
 	}
 }
 
-bool Game::checkFinish(char** board) {
+bool Game::checkFinish(char** board, bool gameCheck) {
+	// whoChecks - true means the game checks. false is AI check. I don't want to add a win object in case AI detects a win.
 	int i;
 	int j;
 	//check rows
@@ -147,12 +142,11 @@ bool Game::checkFinish(char** board) {
 		if (isdigit(board[i][0])) {
 			continue;
 		}
-		if (checkRow(i)) {
-			if (win) {
-				// win might have been initialized on previous checkfinish
-				deleteWin();
+		if (checkRow(board, i)) {
+			if (gameCheck)
+			{
+				win = new RowWin(i + 1);
 			}
-			win = new RowWin(i+1);
 			return true;
 		}
 	}
@@ -161,30 +155,27 @@ bool Game::checkFinish(char** board) {
 		if (isdigit(board[0][i])) {
 			continue;
 		}
-		if (checkColumn(i)) {
-			if (win) {
-				// win might have been initialized on previous checkfinish
-				deleteWin();
+		if (checkColumn(board, i)) {
+			if (gameCheck)
+			{
+				win = new ColumnWin(i + 1);
 			}
-			win = new ColumnWin(i+1);
 			return true;
 		}
 	}
 	//check diagonal
-	if (checkDiagonalRight()) {
-		if (win) {
-			// win might have been initialized on previous checkfinish
-			deleteWin();
+	if (checkDiagonalRight(board)) {
+		if (gameCheck)
+		{
+			win = new DiagonalWin("Right");
 		}
-		win = new DiagonalWin("Right");
 		return true;
 	}
-	if (checkDiagonalLeft()) {
-		if (win) {
-			// win might have been initialized on previous checkfinish
-			deleteWin();
+	if (checkDiagonalLeft(board)) {
+		if (gameCheck)
+		{
+			win = new DiagonalWin("Left");
 		}
-		win = new DiagonalWin("Left");
 		return true;
 	}
 
@@ -209,7 +200,7 @@ bool Game::checkTie() {
 	return true;
 }
 
-bool Game::checkDiagonalRight() {
+bool Game::checkDiagonalRight(char** board) {
 	bool diagonalWin = false;
 	if (isdigit(board[0][0])) return false;
 	if (board[0][0] == board[1][1] && board[1][1] == board[2][2]) 
@@ -217,7 +208,7 @@ bool Game::checkDiagonalRight() {
 	return diagonalWin;
 }
 
-bool Game::checkDiagonalLeft() {
+bool Game::checkDiagonalLeft(char** board) {
 	bool diagonalWin = false;
 	if (isdigit(board[2][0])) return false;
 	if (board[0][2] == board[1][1] && board[1][1] == board[2][0]) 
@@ -225,7 +216,7 @@ bool Game::checkDiagonalLeft() {
 	return diagonalWin;
 }
 
-bool Game::checkColumn(int col) {
+bool Game::checkColumn(char** board, int col) {
 	for (int i = 0; i < colCount - 1; i++) {
 		if (board[i][col] != board[i + 1][col]) {
 			return false;
@@ -234,7 +225,7 @@ bool Game::checkColumn(int col) {
 	return true;
 }
 
-bool Game::checkRow(int row) {
+bool Game::checkRow(char** board, int row) {
 	for (int i = 0; i < rowCount - 1; i++) {
 		if (board[row][i] != board[row][i + 1]) {
 			return false;
@@ -284,48 +275,49 @@ void Game::endTurn() {
 }
 
 void Game::setComputerParameters() {
+	char computerMark; // mark that computer will play with
 	do
 	{
 		system("cls");
 		cout << "Choose difficulty:" << endl << "(1) Easy" << endl << "(2) Normal" << endl << "(3) Hard" << endl << "(4) INSANE" << endl << "Difficulty: ";
 		cin >> difficulty;
 	} while (difficulty != EASY && difficulty != NORMAL && difficulty != HARD && difficulty != INSANE);
-	
-	switch (difficulty)
-	{
-	case EASY:
-		computer = new EasyAI;
-		break;
-	case NORMAL:
-		computer = new NormalAI;
-		break;
-	default:
-		computer = new HardAI;
-		break;
-	}
 
 	// on insane difficulty player is unable to go first
 	if (difficulty == INSANE) {
 		humanPlayer = 2;
 	}
-	else
+	while (humanPlayer != 1 && humanPlayer != 2)
 	{
-		do
-		{
-			system("cls");
-			cout << "Would you like to go first or second?" << endl << "(1) First" << endl << "(2) Second" << endl;
-			cout << "Your choice: ";
-			cin >> humanPlayer;
-		} while (humanPlayer != 1 && humanPlayer != 2);
-		if (humanPlayer == 2) {
-			playerOne = "Computer";
-			playerTwo = "Your";
-		}
-		else {
-			playerTwo = "Computer";
-			playerOne = "Your";
-		}
+		system("cls");
+		cout << "Would you like to go first or second?" << endl << "(1) First" << endl << "(2) Second" << endl;
+		cout << "Your choice: ";
+		cin >> humanPlayer;
 	}
+	if (humanPlayer == 2) {
+		computerMark = 'X';
+		playerOne = "Computer";
+		playerTwo = "Your";
+	}
+	else {
+		computerMark = 'O';
+		playerOne = "Your";
+		playerTwo = "Computer";
+	}
+
+	switch (difficulty)
+	{
+	case EASY:
+		computer = new EasyAI(this);
+		break;
+	case NORMAL:
+		computer = new NormalAI(this, computerMark);
+		break;
+	default:
+		computer = new HardAI(this, computerMark);
+		break;
+	}
+
 }
 
 char** Game::getBoard() {

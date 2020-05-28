@@ -45,12 +45,12 @@ public:
 	pair<int, int> getRowCol(int input);
 	bool checkIndex(pair<int, int> rowCol);
 	void addMark(pair<int, int> boxIndex);
-	bool checkFinish(char** board);
+	bool checkFinish(char** board, bool gameCheck);
 	bool checkTie();
-	bool checkDiagonalRight();
-	bool checkDiagonalLeft();
-	bool checkColumn(int col);
-	bool checkRow(int row);
+	bool checkDiagonalRight(char** board);
+	bool checkDiagonalLeft(char** board);
+	bool checkColumn(char** board, int col);
+	bool checkRow(char** board, int row);
 	void printWinner();
 	void printTie();
 	void printBoard();
