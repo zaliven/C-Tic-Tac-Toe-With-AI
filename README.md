@@ -6,7 +6,7 @@ You may play against a human or choose a difficulty against an AI (Easy, Normal,
 
 Easy - The AI will randomly place its mark.
 
-Normal - AI checks for win moves (player and AI), checks if a corner is available and then checks if the center is available
+Normal - AI checks for win moves (player and AI), checks if the center is available and then checks if a corner is available
 
 Hard - AI checks for win moves (player and AI), checks for fork moves, checks if center is available and then checks if a corner is available
 
