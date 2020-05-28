@@ -58,17 +58,17 @@ pair<int, int> NormalAI::getComputerInput() {
 		}
 
 	}
-	// Play center
-	tempIndex = gameCopy->getRowCol(5);
-	if (isdigit(tempBoard[tempIndex.first][tempIndex.second])) {
-		return tempIndex;
-	}
 	// Play a corner
 	for (int i = 1; i <= 9; i += 2) {
 		tempIndex = gameCopy->getRowCol(i);
 		if (isdigit(tempBoard[tempIndex.first][tempIndex.second])) {
 			return tempIndex;
 		}
+	}
+	// Play center
+	tempIndex = gameCopy->getRowCol(5);
+	if (isdigit(tempBoard[tempIndex.first][tempIndex.second])) {
+		return tempIndex;
 	}
 	// Play a side
 	for (int i = 2; i <= 9; i += 2) {
